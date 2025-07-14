@@ -7,23 +7,23 @@ async function getRandomJoke(){
   try{
     const response = await fetch(https://official-joke-api.appspot.com/random_joke);
     const joke = await response.json();
-    console.log(`${joke.setup}`);
-    console.log(`${joke.punchline}`);
-    console.log(`${joke.type}`);
-    console.log(`${joke.id}`);
+    console.log("${joke.setup}");
+    console.log("${joke.punchline}");
+    console.log("${joke.type}");
+    console.log("${joke.id}");
   }
   catch(error){
-    console.error('API access failed:', error);
+    console.error("API access failed:", error);
   }
 
 //Performance Test function
 //Queries X amount of random jokes, then logs average, highest, and lowest response time
 async performanceTest(requests){
-  console.log('\n\nRunning performance test with ${requests} requests\n\n');
+  console.log("\n\nRunning performance test with ${requests} requests\n\n");
 
   const times = [];
   let errors = 0;
-
+  //Run tests
   for(let i = 0; i < requests; i++){
     const startTime = Date.now();
     try{
@@ -36,12 +36,12 @@ async performanceTest(requests){
     }
   }
 
-    console.log('Performance Test Results:\n');
-
+    console.log("Performance Test Results:\n");
+    
     if(times.length > 0){
       maxTime = Math.max(times);
       minTime = Math.min(times);
-
+      //Find average response time
       let total = 0;
       for(j = 0, j<times.length; j++){
         total +=times[j];
@@ -49,23 +49,64 @@ async performanceTest(requests){
       avgTime = (total/times.length);
     }
 
-    console.log('Average Response time is ${avgTime} milliseconds\n');
-    console.log('Lowest Response time is ${minTime} milliseconds\n');
-    console.log('Highest Response time is ${maxTime} milliseconds\n\n');
+    console.log("Average Response time is ${avgTime} milliseconds\n");
+    console.log("Lowest Response time is ${minTime} milliseconds\n");
+    console.log("Highest Response time is ${maxTime} milliseconds\n\n");
 
     if(errors > 0){
       let errorRate = (errors/requests)*100
     }
-    console.log('Total Error count is ${errors}\n');
-    console.log('Error Percentage is ${errorRate}\n');
+    console.log("Total Error count is ${errors}\n");
+    console.log("Error Percentage is ${errorRate}\n");
   
+}
+
+//Error Handling Test
+//Try a few bad requests and see how the API handles them
+async errorHandlingTest(){
+
+  const baseURL = "https://official-joke-api.appspot.com/random_joke";
+
+  //Create test cases
+  const testCases = [
+    {
+      name: "Missing Endpoint",
+      url: "${this.baseURL}/Blahblahblah",
+      expectedStatus: 404
+    },
+    {
+      name: "Malformed URL",
+      url: "https://official-joke-api.appspot.com//random_joke",
+      expectedStatus: 404
+    }
+  ];
+
+  //Run Error Tests
+
+  for(const testCase of testCases){
+    try{
+      console.log("\nTesting ${testCase.name}\n");
+      const response = await fetch(testCase.url);
+
+      if(response.status == testCase.expectedStatus){ this.log("Expected ${testCase.expectedStatus}, Actual: ${response.status}, success\n"); }
+      else { this.log("Expected ${testCase.expectedStatus}, Actual: ${response.status}, failure\n"); }
+    }
+    catch (error){
+      this.log("Unexpected error occurred during Error Test: ${error.message}", "info");
+    }
+  }
 }
 
 //Main function
 //Run a basic performance test and output the results
+//Then run a basic error handling test and output the results
 async function main(){
-  console.log('Welcome to the Random Joke Generator Public API Performance Test program.\n');
-  const userRequests = prompt('Please enter the number of queries to be run: ');
-
+  console.log("Welcome to the Random Joke Generator Public API Performance Test program.\n");
+  const userRequests = prompt("Please enter the number of queries to be run: ");
   performanceTest(userRequests);
+
+  console.log("\n\nNow running Error Handling Tests...");
+  errorHandlingTest();
+
+  console.log("\n\nTests complete. Ending program...");
 }
